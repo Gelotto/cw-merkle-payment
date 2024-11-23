@@ -1,7 +1,7 @@
 use anybuf::Anybuf;
 use contract::{
     msg::{InstantiateMsg, MigrateMsg},
-    state::Config,
+    state::{AirdropMetadata, Config},
     Contract, ContractExecuteMsgFns, ContractQueryMsgFns,
 };
 use cosmos_sdk_proto::Any;
@@ -28,7 +28,17 @@ pub fn main() -> anyhow::Result<()> {
     contract.upload_if_needed()?;
 
     if contract.address().is_err() {
-        contract.instantiate(&InstantiateMsg { config: Config {} }, Some(&sender), None)?;
+        contract.instantiate(
+            &InstantiateMsg {
+                config: Config {},
+                metadata: AirdropMetadata {
+                    name: "Test".into(),
+                    description: None,
+                },
+            },
+            Some(&sender),
+            None,
+        )?;
 
         let _ = chain.commit_any::<Any>(
             vec![juno_feeshare_msg(
@@ -41,9 +51,6 @@ pub fn main() -> anyhow::Result<()> {
     } else {
         contract.migrate_if_needed(&MigrateMsg {})?;
     }
-
-    // can call any necessary execution messages here like adding admin, etc.
-    contract.set_config(Config {})?;
 
     // can also query any necessary data here from the contract
     contract.config()?;

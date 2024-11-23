@@ -1,7 +1,8 @@
 use crate::error::ContractError;
-use crate::execute::set_config::exec_set_config;
+use crate::execute::claim::exec_claim;
 use crate::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg};
 use crate::query::config::query_config;
+use crate::query::has_claimed::query_has_claim;
 use crate::state::{ExecuteContext, QueryContext};
 use cosmwasm_std::{entry_point, to_json_binary, Env};
 use cosmwasm_std::{Binary, Deps, DepsMut, MessageInfo, Response};
@@ -31,7 +32,7 @@ pub fn execute(
 ) -> Result<Response, ContractError> {
     let ctx = ExecuteContext { deps, env, info };
     match msg {
-        ExecuteMsg::SetConfig(config) => exec_set_config(ctx, config),
+        ExecuteMsg::Claim(msg) => exec_claim(ctx, msg),
     }
 }
 
@@ -44,6 +45,7 @@ pub fn query(
     let ctx = QueryContext { deps, env };
     let result = match msg {
         QueryMsg::Config {} => to_json_binary(&query_config(ctx)?),
+        QueryMsg::HasClaimed { address } => to_json_binary(&query_has_claim(ctx, address)?),
     }?;
     Ok(result)
 }

@@ -8,6 +8,7 @@ pub mod msg;
 pub mod query;
 pub mod responses;
 pub mod state;
+pub mod token;
 
 #[cfg(not(target_arch = "wasm32"))]
 mod interface;
